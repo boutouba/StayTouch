@@ -4,20 +4,6 @@ var { buildSchema } = require('graphql');
 var { request, gql, GraphQLClient } = require('graphql-request');
 const jwt = require("jsonwebtoken");
 
-// GraphQL schema
-var schema = buildSchema(`
-    type Query {
-        user(id: Int!): User
-        users(topic: String): [User]
-    },
-    type User {
-        id: Int
-        first_name: String
-        last_name: String
-        gender: String
-    }
-`);
-
 var app = express();
 app.use(express.json());
 
@@ -96,7 +82,7 @@ app.get('/api/v1/users', async (req, res) => {
 
 })
 
-app.get('/api/v1/users/find', async (req, res) => {
+app.get('/api/v1/users/findnearby', async (req, res) => {
 
   const endpoint = 'http://graphql-engine:8080/v1/graphql'
 
@@ -106,8 +92,8 @@ app.get('/api/v1/users/find', async (req, res) => {
     },
   })
   const query = gql`
-    query findusers($radius: Int!) {
-      user(where: { id: { _eq: $radius } }) {
+    query user {
+      user {
         id
         first_name
         last_name
@@ -120,7 +106,7 @@ app.get('/api/v1/users/find', async (req, res) => {
     }
   `
 
-  const data = await graphQLClient.request(query,{radius: 1})
+  const data = await graphQLClient.request(query)
   res.send(data);
 
 })
